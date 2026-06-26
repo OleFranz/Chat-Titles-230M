@@ -1,8 +1,6 @@
-# Chat-Titles-135M
+# Chat-Titles-230M
 
-Chat-Titles-135M is a small chat-title generator fine-tuned on the `ogrnz/chat-titles` dataset, based on `unsloth/SmolLM2-135M-Instruct`.
-<br>
-The model can only generate titles for English messages.
+Chat-Titles-230M is a small chat-title generator fine-tuned on the `ogrnz/chat-titles` dataset, based on `unsloth/LFM2.5-230M`.
 
 ## Examples
 | Message | Title |

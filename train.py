@@ -22,9 +22,9 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
-MODEL_NAME = "unsloth/SmolLM2-135M-Instruct"
+MODEL_NAME = "unsloth/LFM2.5-230M"
 DATASET_NAME = "ogrnz/chat-titles"
-OUTPUT_DIR = "Chat-Titles-135M"
+OUTPUT_DIR = "Chat-Titles-230M"
 MAX_SEQ_LEN = 4096
 LOAD_IN_4BIT = False
 VAL_SPLIT_RATIO = 0.05

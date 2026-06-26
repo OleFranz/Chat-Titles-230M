@@ -1,6 +1,6 @@
 from llama_cpp import Llama
 
-model = Llama(model_path="./Chat-Titles-135M-GGUF/Chat-Titles-135M-q4_k_m.gguf")
+model = Llama(model_path="./Chat-Titles-230M-GGUF/Chat-Titles-230M-q4_k_m.gguf")
 
 while True:
     conversation = [

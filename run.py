@@ -1,7 +1,7 @@
 from unsloth import FastLanguageModel
 
 title_model, title_tokenizer = FastLanguageModel.from_pretrained(
-    model_name="Chat-Titles-135M",
+    model_name="Chat-Titles-230M",
     load_in_4bit=False,
     device_map="auto"
 )
