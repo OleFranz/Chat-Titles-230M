@@ -5,8 +5,8 @@ Chat-Titles-230M is a small chat-title generator fine-tuned on the `ogrnz/chat-t
 ## Examples
 | Message | Title |
 | --- | --- |
-| Can you summarize the key points from the meeting transcript? | Summary of Meeting Transcript |
-| My laptop battery drains fast after the latest update. Any ideas? | Laptop Battery Drainage After Update |
-| Write a short, friendly email to reschedule a call for next week. | Email for Rescheduling Call |
+| Can you summarize the key points from the meeting transcript? | Meeting Transcript Summary |
+| My laptop battery drains fast after the latest update. Any ideas? | Laptop Battery Drain |
+| Write a short, friendly email to reschedule a call for next week. | Rescheduling Call |
 | I need a workout plan for beginners that I can do at home. | Beginner Workout Plan |
-| Please explain the difference between HTTP and HTTPS in simple terms. | HTTP vs HTTPS Explained |
+| Please explain the difference between HTTP and HTTPS in simple terms. | HTTP vs HTTPS |
