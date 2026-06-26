@@ -43,4 +43,5 @@ os.mkdir(f"{script_path}Chat-Titles-230M-GGUF")
 os.system(f"cd {script_path} && python llama.cpp/convert_hf_to_gguf.py Chat-Titles-230M-Merged --outfile Chat-Titles-230M-GGUF/Chat-Titles-230M-f16.gguf --outtype f16")
 
 os.system(f"cd {script_path} && .\\llama.cpp\\build\\bin\\Release\\llama-quantize.exe Chat-Titles-230M-GGUF/Chat-Titles-230M-f16.gguf Chat-Titles-230M-GGUF/Chat-Titles-230M-q8_0.gguf q8_0")
+os.system(f"cd {script_path} && .\\llama.cpp\\build\\bin\\Release\\llama-quantize.exe Chat-Titles-230M-GGUF/Chat-Titles-230M-f16.gguf Chat-Titles-230M-GGUF/Chat-Titles-230M-q6_k.gguf q6_k")
 os.system(f"cd {script_path} && .\\llama.cpp\\build\\bin\\Release\\llama-quantize.exe Chat-Titles-230M-GGUF/Chat-Titles-230M-f16.gguf Chat-Titles-230M-GGUF/Chat-Titles-230M-q4_k_m.gguf q4_k_m")
