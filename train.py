@@ -11,6 +11,7 @@ from unsloth import FastLanguageModel, unsloth_train, is_bfloat16_supported
 from unsloth.chat_templates import train_on_responses_only
 
 import torch
+import json
 from datasets import load_dataset
 from trl import SFTTrainer, SFTConfig
 from transformers import PreTrainedModel, PreTrainedTokenizer
@@ -29,8 +30,8 @@ MAX_SEQ_LEN = 4096
 LOAD_IN_4BIT = False
 VAL_SPLIT_RATIO = 0.05
 
-LORA_RANK = 16
-LORA_ALPHA = 16
+LORA_RANK = 256
+LORA_ALPHA = 256
 LORA_DROPOUT = 0.0
 
 BATCH_SIZE = 8
@@ -39,6 +40,29 @@ LR = 0.0001
 WARMUP_RATIO = 0.1
 NUM_EPOCHS = 1
 WEIGHT_DECAY = 0.01
+
+DEFAULT_SYSTEM_PROMPT = "You are an assistant that writes short, descriptive titles for chat conversations."
+_NAMESPACE_MARKER = 'namespace(system_prompt="", last_user_index=-1)'
+
+
+def bake_default_system_prompt(chat_template, system_prompt):
+    if not chat_template or _NAMESPACE_MARKER not in chat_template:
+        raise ValueError("namespace marker not found in chat_template")
+    escaped = system_prompt.replace("\\", "\\\\").replace('"', '\\"')
+    return chat_template.replace(_NAMESPACE_MARKER, f'namespace(system_prompt="{escaped}", last_user_index=-1)', 1)
+
+
+def write_chat_template(directory, chat_template):
+    os.makedirs(directory, exist_ok=True)
+    with open(os.path.join(directory, "chat_template.jinja"), "w", encoding="utf-8") as f:
+        f.write(chat_template)
+    config_path = os.path.join(directory, "tokenizer_config.json")
+    if os.path.exists(config_path):
+        with open(config_path, "r", encoding="utf-8") as f:
+            config = json.load(f)
+        config["chat_template"] = chat_template
+        with open(config_path, "w", encoding="utf-8") as f:
+            json.dump(config, f, indent=2, ensure_ascii=False)
 
 
 model: PreTrainedModel
@@ -70,6 +94,8 @@ model, tokenizer = FastLanguageModel.from_pretrained(
     load_in_4bit=LOAD_IN_4BIT
 )
 
+tokenizer.chat_template = bake_default_system_prompt(tokenizer.chat_template, DEFAULT_SYSTEM_PROMPT)
+
 model = FastLanguageModel.get_peft_model(
     model,
     r=LORA_RANK,
@@ -80,7 +106,7 @@ model = FastLanguageModel.get_peft_model(
         "o_proj",
         "gate_proj",
         "up_proj",
-        "down_proj",
+        "down_proj"
     ],
     lora_alpha=LORA_ALPHA,
     lora_dropout=LORA_DROPOUT,
@@ -141,5 +167,6 @@ unsloth_train(trainer)
 
 model.save_pretrained(OUTPUT_DIR)
 tokenizer.save_pretrained(OUTPUT_DIR)
+write_chat_template(OUTPUT_DIR, tokenizer.chat_template)
 
 print(f"Training completed. Model saved to '{OUTPUT_DIR}'")

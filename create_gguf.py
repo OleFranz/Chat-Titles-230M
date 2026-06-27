@@ -1,6 +1,7 @@
 from unsloth import FastLanguageModel
 import shutil
 import os
+import json
 
 
 script_path = str(os.path.dirname(os.path.realpath(__file__))).replace("\\", "/")
@@ -15,6 +16,33 @@ from transformers import PreTrainedModel, PreTrainedTokenizer
 model: PreTrainedModel
 tokenizer: PreTrainedTokenizer
 
+DEFAULT_SYSTEM_PROMPT = "You are an assistant that writes short, descriptive titles for chat conversations."
+_NAMESPACE_MARKER = 'namespace(system_prompt="", last_user_index=-1)'
+
+
+def bake_default_system_prompt(chat_template, system_prompt):
+    if not chat_template or _NAMESPACE_MARKER not in chat_template:
+        raise ValueError("namespace marker not found in chat_template")
+    escaped = system_prompt.replace("\\", "\\\\").replace('"', '\\"')
+    return chat_template.replace(_NAMESPACE_MARKER, f'namespace(system_prompt="{escaped}", last_user_index=-1)', 1)
+
+
+def is_baked(chat_template, system_prompt):
+    return bool(chat_template) and system_prompt in chat_template
+
+
+def write_chat_template(directory, chat_template):
+    os.makedirs(directory, exist_ok=True)
+    with open(os.path.join(directory, "chat_template.jinja"), "w", encoding="utf-8") as f:
+        f.write(chat_template)
+    config_path = os.path.join(directory, "tokenizer_config.json")
+    if os.path.exists(config_path):
+        with open(config_path, "r", encoding="utf-8") as f:
+            config = json.load(f)
+        config["chat_template"] = chat_template
+        with open(config_path, "w", encoding="utf-8") as f:
+            json.dump(config, f, indent=2, ensure_ascii=False)
+
 
 model, tokenizer = FastLanguageModel.from_pretrained(
     model_name="Chat-Titles-230M",
@@ -22,11 +50,17 @@ model, tokenizer = FastLanguageModel.from_pretrained(
     device_map="auto"
 )
 
+if not is_baked(tokenizer.chat_template, DEFAULT_SYSTEM_PROMPT):
+    tokenizer.chat_template = bake_default_system_prompt(tokenizer.chat_template, DEFAULT_SYSTEM_PROMPT)
+
 model.save_pretrained_merged(
     "Chat-Titles-230M-Merged",
     tokenizer,
     save_method="merged_16bit"
 )
+
+merged_dir = f"{script_path}Chat-Titles-230M-Merged"
+write_chat_template(merged_dir, tokenizer.chat_template)
 
 
 if os.path.exists(f"{script_path}llama.cpp") == False:
